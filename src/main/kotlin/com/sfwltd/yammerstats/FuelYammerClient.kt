@@ -25,9 +25,7 @@ class FuelYammerClient @Autowired constructor(val yammerConfig: StatsConfigurati
         val (request, response, result) = yammerRequest.response()
         when (result) {
             is Result.Success -> {
-                val responseData = parser.parse(ByteArrayInputStream(response.data)) as JsonObject
-                val messages = responseData["messages"] as JsonArray<JsonObject>
-                return messages
+                return (parser.parse(ByteArrayInputStream(response.data)) as JsonObject)["messages"] as JsonArray<JsonObject>
             }
             is Result.Failure -> {
                 return JsonArray()

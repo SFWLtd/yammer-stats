@@ -28,34 +28,11 @@ class HelloControllerTest {
         configureFor("localhost", 8089)
         stubFor(get(urlPathMatching("/api/v1/messages.json")).withQueryParam("older_than", containing("2147483647")).atPriority(1).willReturn(aResponse().withBody("""
         {
-                "threaded_extended": {},
                 "messages": [
                 {
                     "id": 8,
                     "sender_id": 1,
-                    "replied_to_id": 9,
-                    "created_at": "2016/04/21 07:41:03 +0000",
-                    "network_id": 2222,
-                    "message_type": "update",
-                    "sender_type": "user",
-                    "url": "https://www.yammer.com/api/v1/messages/692534234",
-                    "web_url": "https://www.yammer.com/sfwltd.co.uk/messages/692534234",
-                    "group_id": 10,
-                    "body": {
-                    "parsed": "Text",
-                    "plain": "Text",
-                    "rich": "Text"
                 },
-                    "thread_id": 11,
-                    "client_type": "Web",
-                    "client_url": "https://www.yammer.com/",
-                    "system_message": false,
-                    "direct_message": false,
-                    "chat_client_sequence": null,
-                    "language": "en",
-                    "notified_user_ids": [],
-                    "privacy": "public",
-                    "attachments": [],
                     "liked_by": {
                         "count": 1,
                         "names": [
@@ -67,8 +44,6 @@ class HelloControllerTest {
                             }
                         ]
                     },
-                    "content_excerpt": "Text",
-                    "group_created_id": 10
                 }]
         }
         """)))
