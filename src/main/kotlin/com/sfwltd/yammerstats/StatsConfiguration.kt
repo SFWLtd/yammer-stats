@@ -10,6 +10,11 @@ open class StatsConfiguration {
     data class YammerConfig(val host:String = "https://yammer.com", val accessToken: String)
 
     @Bean
+    open fun yammerClient():YammerClient {
+        return FuelYammerClient(yammerConfig())
+    }
+
+    @Bean
     open fun yammerConfig():YammerConfig {
         val accessTokenFile = File("accesstoken")
 

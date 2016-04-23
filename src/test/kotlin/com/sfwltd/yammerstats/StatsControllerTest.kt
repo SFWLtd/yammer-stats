@@ -2,13 +2,10 @@ package com.sfwltd.yammerstats
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import org.junit.Ignore
+import com.sfwltd.yammerstats.StatsConfiguration.YammerConfig
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.boot.test.SpringApplicationConfiguration
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockServletContext
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
@@ -81,7 +78,7 @@ class HelloControllerTest {
             "full_name": "Adam Londero"
         }
         """)))
-        val mvc = MockMvcBuilders.standaloneSetup(StatsController(StatsConfiguration.YammerConfig(host="http://localhost:8089", accessToken = "anything"))).build()
+        val mvc = MockMvcBuilders.standaloneSetup(StatsController(FuelYammerClient(YammerConfig(host = "http://localhost:8089", accessToken = "anything")))).build()
         mvc.perform(MockMvcRequestBuilders.get("/toplikes")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk)
