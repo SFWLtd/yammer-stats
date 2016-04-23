@@ -18,22 +18,32 @@ class StatsController @Autowired constructor(val yammerConfig: StatsConfiguratio
         FuelManager.instance.basePath = yammerConfig.host
         val likeMap = HashMap<Int, Int>()
         val parser = Parser()
-        val yammerRequest = "/api/v1/messages.json".httpGet()
-        yammerRequest.httpHeaders.put("Authorization", "Bearer ${yammerConfig.accessToken}")
-        val (request, response, result) = yammerRequest.response()
-        val responseData = parser.parse(ByteArrayInputStream(response.data)) as JsonObject
-        val messages = responseData["messages"] as JsonArray<JsonObject>
-        messages.filter{
-            (it["liked_by"] as JsonObject).int("count")!! > 0
-        }.map {
-            Pair(it.int("sender_id"),
-                    (it["liked_by"] as JsonObject).int("count"))
-        }.forEach {
-            val (msgAuthorId , msgLikes) = it
-            if (!likeMap.containsKey(msgAuthorId)) {
-                likeMap.put(msgAuthorId!!, msgLikes!!)
-            } else {
-                likeMap.replace(msgAuthorId!!, likeMap[msgAuthorId]!!.plus(msgLikes!!))
+        var olderThan = Int.MAX_VALUE
+
+        for (pages in 1..10) {
+            val yammerRequest = "/api/v1/messages.json".httpGet(listOf("older_than" to olderThan))
+            yammerRequest.httpHeaders.put("Authorization", "Bearer ${yammerConfig.accessToken}")
+            val (request, response, result) = yammerRequest.response()
+            when (result) {
+                is Result.Success -> {
+                    val responseData = parser.parse(ByteArrayInputStream(response.data)) as JsonObject
+                    val messages = responseData["messages"] as JsonArray<JsonObject>
+                    messages.filter {
+                        (it["liked_by"] as JsonObject).int("count")!! > 0
+                    }.map {
+                        Triple(it.int("sender_id"),
+                                (it["liked_by"] as JsonObject).int("count"),
+                                it.int("id"))
+                    }.forEach {
+                        val (msgAuthorId, msgLikes, msgId) = it
+                        if (!likeMap.containsKey(msgAuthorId)) {
+                            likeMap.put(msgAuthorId!!, msgLikes!!)
+                        } else {
+                            likeMap.replace(msgAuthorId!!, likeMap[msgAuthorId]!!.plus(msgLikes!!))
+                        }
+                        olderThan = msgId!!;
+                    }
+                }
             }
         }
 

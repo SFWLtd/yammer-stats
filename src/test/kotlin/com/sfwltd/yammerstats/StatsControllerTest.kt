@@ -28,7 +28,7 @@ class HelloControllerTest {
         val wireMockServer = WireMockServer(8089)
         wireMockServer.start()
         configureFor("localhost", 8089)
-        stubFor(get(urlPathMatching("/api/v1/messages.json")).willReturn(aResponse().withBody("""
+        stubFor(get(urlPathMatching("/api/v1/messages.json")).withQueryParam("older_than", containing("2147483647")).atPriority(1).willReturn(aResponse().withBody("""
         {
                 "threaded_extended": {},
                 "messages": [
