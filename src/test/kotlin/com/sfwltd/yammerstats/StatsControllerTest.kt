@@ -2,6 +2,7 @@ package com.sfwltd.yammerstats
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.boot.test.SpringApplicationConfiguration
@@ -84,7 +85,7 @@ class HelloControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/toplikes")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk)
-                .andExpect(content().json("""{"Adam Londero": 1}"""))
+                .andExpect(content().json("""[{"name":"Adam Londero", "likes": 1}]"""))
         wireMockServer.stop()
     }
 }

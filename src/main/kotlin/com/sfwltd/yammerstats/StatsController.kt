@@ -47,7 +47,8 @@ class StatsController @Autowired constructor(val yammerConfig: StatsConfiguratio
             }
         }
 
-        val leaderboard = HashMap<String, Int>()
+        data class LeaderboardEntry(val name:String, val likes:Int)
+        val leaderboard = ArrayList<LeaderboardEntry>()
         likeMap.forEach {
             val (authorId, likes) = it;
             val userRequest = "/api/v1/users/$authorId.json".httpGet()
@@ -56,11 +57,13 @@ class StatsController @Autowired constructor(val yammerConfig: StatsConfiguratio
             when (result) {
                 is Result.Success -> {
                     val responseData = parser.parse(ByteArrayInputStream(response.data)) as JsonObject
-                    leaderboard.put(responseData.string("full_name")!!, likes)
+                    leaderboard.add(LeaderboardEntry(responseData.string("full_name")!!, likes))
                 }
             }
         }
 
-        return JsonObject(leaderboard).toJsonString()
+        return json {
+            array(leaderboard.sortedByDescending { it.likes }.map { obj(Pair("name", it.name), Pair("likes", it.likes)) })
+        }.toJsonString()
     }
 }
