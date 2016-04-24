@@ -28,11 +28,14 @@ class HelloControllerTest {
         configureFor("localhost", 8089)
         stubFor(get(urlPathMatching("/api/v1/messages.json")).withQueryParam("older_than", containing("2147483647")).atPriority(1).willReturn(aResponse().withBody("""
         {
+                "threaded_extended": {},
                 "messages": [
                 {
                     "id": 8,
                     "sender_id": 1,
-                },
+                    "replied_to_id": 9,
+                    "created_at": "2016/04/21 07:41:03 +0000",
+                    "group_id": 10,
                     "liked_by": {
                         "count": 1,
                         "names": [
@@ -43,7 +46,7 @@ class HelloControllerTest {
                                 "network_id": 2222
                             }
                         ]
-                    },
+                    }
                 }]
         }
         """)))
