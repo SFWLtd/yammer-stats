@@ -39,4 +39,6 @@ dependencies {
     testCompile "com.github.tomakehurst:wiremock:2.0.10-beta"
 }
 
-task wrapper(type: Wrapper)
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.12'
+}
