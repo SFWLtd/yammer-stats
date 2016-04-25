@@ -42,3 +42,7 @@ dependencies {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.12'
 }
+
+springBoot {
+    mainClass = 'com.sfwltd.yammerstats.StatsApplication'
+}
