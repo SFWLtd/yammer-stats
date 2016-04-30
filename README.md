@@ -4,7 +4,7 @@ Provides some stats about a Yammer organisation.
 ## How to build and run
 0. Clone repository
 0. Run `gradle build`
-0. Get an application access token for your organisation and place in a file called 'accesstoken' (see accesstoken.example)
+0. Get an application access token for your organisation and update the property 'yammer.accesstoken' (see application.properties.example)
 0. Run the built jar file
 
 ## Retriving leaderboard of users with most liked posts
