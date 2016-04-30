@@ -1,4 +1,4 @@
-package com.sfwltd.yammerstats
+package com.sfwltd.yammerstats.client.fuel
 
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
@@ -7,10 +7,13 @@ import com.beust.klaxon.string
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
+import com.sfwltd.yammerstats.StatsConfiguration
+import com.sfwltd.yammerstats.client.YammerMessageClient
+import com.sfwltd.yammerstats.client.YammerUserClient
 import org.springframework.beans.factory.annotation.Autowired
 import java.io.ByteArrayInputStream
 
-class FuelYammerClient @Autowired constructor(val yammerConfig: StatsConfiguration.YammerConfig): YammerClient {
+class FuelYammerClient @Autowired constructor(val yammerConfig: StatsConfiguration.YammerConfig): YammerMessageClient, YammerUserClient {
 
     val parser: Parser;
 
@@ -20,9 +23,10 @@ class FuelYammerClient @Autowired constructor(val yammerConfig: StatsConfigurati
     }
 
     override fun getMessages(olderThan: Int): JsonArray<JsonObject> {
-        val yammerRequest = "/api/v1/messages.json".httpGet(listOf("older_than" to olderThan))
-        yammerRequest.httpHeaders.put("Authorization", "Bearer ${yammerConfig.accessToken}")
-        val (request, response, result) = yammerRequest.response()
+        val (request, response, result) = "/api/v1/messages.json".httpGet(listOf("older_than" to olderThan)).run {
+            httpHeaders.put("Authorization", "Bearer ${yammerConfig.accessToken}")
+            response()
+        }
         when (result) {
             is Result.Success -> {
                 return (parser.parse(ByteArrayInputStream(response.data)) as JsonObject)["messages"] as JsonArray<JsonObject>
@@ -33,17 +37,19 @@ class FuelYammerClient @Autowired constructor(val yammerConfig: StatsConfigurati
         }
     }
 
-    override fun getUserFullName(id: Int): String {
-        val userRequest = "/api/v1/users/$id.json".httpGet()
-        userRequest.httpHeaders.put("Authorization", "Bearer ${yammerConfig.accessToken}")
-        val (request, response, result) = userRequest.response()
+    override fun getUserFullName(id: Int): String? {
+        val (request, response, result) = "/api/v1/users/$id.json".httpGet().run {
+            httpHeaders.put("Authorization", "Bearer ${yammerConfig.accessToken}")
+            response()
+        }
         when (result) {
             is Result.Success -> {
                 return (parser.parse(ByteArrayInputStream(response.data)) as JsonObject).string("full_name")!!
             }
             is Result.Failure -> {
-                return "Unknown"
+                return null
             }
         }
     }
+
 }

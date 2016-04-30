@@ -3,13 +3,15 @@ package com.sfwltd.yammerstats;
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.int
 import com.beust.klaxon.json
+import com.sfwltd.yammerstats.client.YammerMessageClient
+import com.sfwltd.yammerstats.client.YammerUserClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 @RestController
-class StatsController @Autowired constructor(val yammerClient: YammerClient) {
+class StatsController @Autowired constructor(val yammerMessageClient: YammerMessageClient, val yammerUserClient: YammerUserClient) {
 
     @RequestMapping("/toplikes")
     fun topLikes(): String {
@@ -17,7 +19,7 @@ class StatsController @Autowired constructor(val yammerClient: YammerClient) {
         var olderThan = Int.MAX_VALUE
 
         for (pages in 1..10) {
-            yammerClient.getMessages(olderThan)
+            yammerMessageClient.getMessages(olderThan)
                 .filter {(it["liked_by"] as JsonObject).int("count")!! > 0}
                 .map {
                     Triple(it.int("sender_id"),
@@ -35,7 +37,7 @@ class StatsController @Autowired constructor(val yammerClient: YammerClient) {
         }
 
         data class LeaderboardEntry(val name:String, val likes:Int)
-        val leaderboard = likeMap.map { LeaderboardEntry(yammerClient.getUserFullName(it.key), it.value) }
+        val leaderboard = likeMap.map { LeaderboardEntry(yammerUserClient.getUserFullName(it.key) ?: "Unknown", it.value) }
             .fold(listOf<LeaderboardEntry>()) {list, entry -> list+entry}
             .sortedByDescending { it.likes }
 

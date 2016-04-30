@@ -3,6 +3,7 @@ package com.sfwltd.yammerstats
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.sfwltd.yammerstats.StatsConfiguration.YammerConfig
+import com.sfwltd.yammerstats.client.fuel.FuelYammerClient
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.boot.test.SpringApplicationConfiguration
@@ -56,7 +57,8 @@ class HelloControllerTest {
             "full_name": "Adam Londero"
         }
         """)))
-        val mvc = MockMvcBuilders.standaloneSetup(StatsController(FuelYammerClient(YammerConfig(host = "http://localhost:8089", accessToken = "anything")))).build()
+        val yammerClient = FuelYammerClient(YammerConfig(host = "http://localhost:8089", accessToken = "anything"))
+        val mvc = MockMvcBuilders.standaloneSetup(StatsController(yammerClient, yammerClient)).build()
         mvc.perform(MockMvcRequestBuilders.get("/toplikes")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk)

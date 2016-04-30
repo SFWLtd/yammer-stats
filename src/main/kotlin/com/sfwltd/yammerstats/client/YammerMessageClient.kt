@@ -1,11 +1,10 @@
-package com.sfwltd.yammerstats
+package com.sfwltd.yammerstats.client
 
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 
-interface YammerClient {
+interface YammerMessageClient {
 
     fun getMessages(olderThan: Int): JsonArray<JsonObject>
 
-    fun getUserFullName(id: Int): String
 }

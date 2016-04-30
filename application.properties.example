@@ -1,0 +1,5 @@
+yammer.accesstoken=123456-aB1CDEFghIjKlMnOPQRst
+
+redis.host=localhost
+redis.port=6379
+redis.password=password
