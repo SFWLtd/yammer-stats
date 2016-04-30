@@ -1,13 +1,12 @@
 package com.sfwltd.yammerstats;
 
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.int
 import com.beust.klaxon.json
 import com.sfwltd.yammerstats.client.YammerMessageClient
 import com.sfwltd.yammerstats.client.YammerUserClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.lang.Math.min
 import java.util.*
 
 @RestController
@@ -20,19 +19,10 @@ class StatsController @Autowired constructor(val yammerMessageClient: YammerMess
 
         for (pages in 1..10) {
             yammerMessageClient.getMessages(olderThan)
-                .filter {(it["liked_by"] as JsonObject).int("count")!! > 0}
-                .map {
-                    Triple(it.int("sender_id"),
-                            (it["liked_by"] as JsonObject).int("count"),
-                            it.int("id"))
-                }.forEach {
-                    val (msgAuthorId, msgLikes, msgId) = it
-                    if (!likeMap.containsKey(msgAuthorId)) {
-                        likeMap.put(msgAuthorId!!, msgLikes!!)
-                    } else {
-                        likeMap.replace(msgAuthorId!!, likeMap[msgAuthorId]!!.plus(msgLikes!!))
-                    }
-                    olderThan = msgId!!
+                .filter {it.likes > 0}
+                .forEach {
+                    likeMap[it.senderId] = likeMap.getOrDefault(it.senderId, 0) + it.likes
+                    olderThan = min(it.id, olderThan)
                 }
         }
 

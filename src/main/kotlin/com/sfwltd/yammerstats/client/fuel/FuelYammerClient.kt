@@ -1,9 +1,6 @@
 package com.sfwltd.yammerstats.client.fuel
 
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Parser
-import com.beust.klaxon.string
+import com.beust.klaxon.*
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
@@ -22,14 +19,15 @@ class FuelYammerClient @Autowired constructor(val yammerConfig: StatsConfigurati
         parser = Parser()
     }
 
-    override fun getMessages(olderThan: Int): JsonArray<JsonObject> {
+    override fun getMessages(olderThan: Int): List<YammerMessageClient.YammerMessage> {
         val (request, response, result) = "/api/v1/messages.json".httpGet(listOf("older_than" to olderThan)).run {
             httpHeaders.put("Authorization", "Bearer ${yammerConfig.accessToken}")
             response()
         }
         when (result) {
             is Result.Success -> {
-                return (parser.parse(ByteArrayInputStream(response.data)) as JsonObject)["messages"] as JsonArray<JsonObject>
+                return ((parser.parse(ByteArrayInputStream(response.data)) as JsonObject)["messages"] as JsonArray<JsonObject>)
+                        .map { YammerMessageClient.YammerMessage(it.int("id")!!, (it["liked_by"] as JsonObject).int("count")!!, it.int("sender_id")!!) }
             }
             is Result.Failure -> {
                 return JsonArray()

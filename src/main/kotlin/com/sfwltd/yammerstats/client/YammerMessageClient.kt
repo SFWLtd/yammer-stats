@@ -1,10 +1,9 @@
 package com.sfwltd.yammerstats.client
 
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-
 interface YammerMessageClient {
 
-    fun getMessages(olderThan: Int): JsonArray<JsonObject>
+    data class YammerMessage(val id:Int, val likes:Int, val senderId:Int)
+
+    fun getMessages(olderThan: Int): List<YammerMessage>
 
 }
