@@ -42,7 +42,7 @@ class FuelYammerClient @Autowired constructor(val yammerConfig: StatsConfigurati
         }
         when (result) {
             is Result.Success -> {
-                return (parser.parse(ByteArrayInputStream(response.data)) as JsonObject).string("full_name")!!
+                return (parser.parse(ByteArrayInputStream(response.data)) as JsonObject).string("full_name")
             }
             is Result.Failure -> {
                 return null

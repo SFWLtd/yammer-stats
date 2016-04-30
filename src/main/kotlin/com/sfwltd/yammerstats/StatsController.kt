@@ -32,7 +32,7 @@ class StatsController @Autowired constructor(val yammerMessageClient: YammerMess
             .sortedByDescending { it.likes }
 
         return json {
-            array(leaderboard.map { obj(Pair("name", it.name), Pair("likes", it.likes)) })
+            array(leaderboard.map { obj("name" to it.name, "likes" to it.likes) })
         }.toJsonString()
     }
 }
