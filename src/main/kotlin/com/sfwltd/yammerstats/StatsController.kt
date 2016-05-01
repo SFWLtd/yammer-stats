@@ -1,6 +1,5 @@
 package com.sfwltd.yammerstats;
 
-import com.beust.klaxon.json
 import com.sfwltd.yammerstats.client.YammerMessageClient
 import com.sfwltd.yammerstats.client.YammerUserClient
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,8 +11,10 @@ import java.util.*
 @RestController
 class StatsController @Autowired constructor(val yammerMessageClient: YammerMessageClient, val yammerUserClient: YammerUserClient) {
 
+    data class LeaderboardEntry(val name: String, val likes: Int)
+
     @RequestMapping("/toplikes")
-    fun topLikes(): String {
+    fun topLikes(): List<LeaderboardEntry> {
         val likeMap = HashMap<Int, Int>()
         var olderThan = Int.MAX_VALUE
 
@@ -26,13 +27,8 @@ class StatsController @Autowired constructor(val yammerMessageClient: YammerMess
                 }
         }
 
-        data class LeaderboardEntry(val name:String, val likes:Int)
-        val leaderboard = likeMap.map { LeaderboardEntry(yammerUserClient.getUserFullName(it.key) ?: "Unknown", it.value) }
+        return likeMap.map { LeaderboardEntry(yammerUserClient.getUserFullName(it.key) ?: "Unknown", it.value) }
             .fold(listOf<LeaderboardEntry>()) {list, entry -> list+entry}
             .sortedByDescending { it.likes }
-
-        return json {
-            array(leaderboard.map { obj("name" to it.name, "likes" to it.likes) })
-        }.toJsonString()
     }
 }
