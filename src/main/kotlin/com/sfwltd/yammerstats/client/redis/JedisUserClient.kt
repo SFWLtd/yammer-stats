@@ -1,12 +1,14 @@
 package com.sfwltd.yammerstats.client.redis
 
 import com.sfwltd.yammerstats.client.YammerUserClient
-import redis.clients.jedis.Jedis
+import redis.clients.jedis.JedisPool
 
 /**
  * Attempts to retrieve a user name from a Redis cache, falling back to a delegate YammerUserClient if not found
  */
-class JedisUserClient(val jedisClient: Jedis, val delegate: YammerUserClient) : YammerUserClient {
+class JedisUserClient(val jedisPool: JedisPool, val delegate: YammerUserClient) : YammerUserClient {
     override fun getUserFullName(id: Int): String? =
-            jedisClient.get(id.toString()) ?: delegate.getUserFullName(id)?.apply { jedisClient.set(id.toString(), this) }
+            lambda@ jedisPool.resource.use {
+                it.get(id.toString()) ?: delegate.getUserFullName(id)?.apply { lambda@it.set(id.toString(), this) }
+            }
 }

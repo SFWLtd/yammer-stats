@@ -6,36 +6,42 @@ import com.sfwltd.yammerstats.client.YammerUserClient
 import com.sfwltd.yammerstats.client.redis.JedisUserClient
 import org.junit.Assert.fail
 import org.junit.Test
-import redis.clients.jedis.Jedis
-import redis.clients.jedis.JedisShardInfo
+import org.junit.runner.RunWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.TestPropertySource
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import redis.clients.jedis.JedisPool
 
+@RunWith(SpringJUnit4ClassRunner::class)
+@ContextConfiguration(classes = arrayOf(StatsConfiguration::class))
+@TestPropertySource("file:application.properties")
 class JedisUserClientTest {
 
-    val jedisClient: Jedis
-
-    init {
-        val shardInfo = JedisShardInfo("sfwyammerstats.redis.cache.windows.net", 6379)
-        shardInfo.password = "U5v0fBNINzqldhmCIFF//8M0d1xUj1NNjwBpO/4f1nU="
-        jedisClient = Jedis(shardInfo)
-    }
+    @Autowired lateinit var jedisPool: JedisPool
 
     @Test
     fun retrievesFromCache() {
-        jedisClient.del("1")
-        val client = JedisUserClient(jedisClient, object : YammerUserClient {
+        jedisPool.resource.use {
+            it.del("1")
+            it.set("1", "Testy McTestface")
+        }
+
+        val client = JedisUserClient(jedisPool, object : YammerUserClient {
             override fun getUserFullName(id: Int): String? {
                 fail("Should not be called")
                 return ""
             }
         })
-        jedisClient.set("1", "Testy McTestface")
         assertThat(client.getUserFullName(1)!!, equalTo("Testy McTestface"))
     }
 
     @Test
     fun delegatesIfNotContainedInCache() {
-        jedisClient.del("2")
-        val client = JedisUserClient(jedisClient, object : YammerUserClient {
+        jedisPool.resource.use {
+            it.del("2")
+        }
+        val client = JedisUserClient(jedisPool, object : YammerUserClient {
             override fun getUserFullName(id: Int): String? {
                 return "From delegate"
             }
@@ -45,9 +51,11 @@ class JedisUserClientTest {
 
     @Test
     fun savesDelegatedResultInCache() {
-        jedisClient.del("3")
+        jedisPool.resource.use {
+            it.del("3")
+        }
         var jedisCalled = 0
-        val client = JedisUserClient(jedisClient, object : YammerUserClient {
+        val client = JedisUserClient(jedisPool, object : YammerUserClient {
             override fun getUserFullName(id: Int): String? {
                 jedisCalled++
                 return "From delegate"
@@ -63,9 +71,11 @@ class JedisUserClientTest {
 
     @Test
     fun doesNotSaveWhenDelegateDidntFindName() {
-        jedisClient.del("4")
+        jedisPool.resource.use {
+            it.del("4")
+        }
         var jedisCalled = 0
-        val client = JedisUserClient(jedisClient, object : YammerUserClient {
+        val client = JedisUserClient(jedisPool, object : YammerUserClient {
             override fun getUserFullName(id: Int): String? {
                 jedisCalled++
                 return null

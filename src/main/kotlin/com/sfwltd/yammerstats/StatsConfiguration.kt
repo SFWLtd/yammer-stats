@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
-import redis.clients.jedis.Jedis
-import redis.clients.jedis.JedisShardInfo
+import redis.clients.jedis.JedisPool
+import redis.clients.jedis.JedisPoolConfig
 
 @Configuration
 open class StatsConfiguration {
@@ -16,11 +16,10 @@ open class StatsConfiguration {
 
     @Autowired lateinit var env:Environment;
 
-    @Bean open fun yammerUserClient() = JedisUserClient(jedis(), fuelYammerClient())
+    @Bean open fun yammerUserClient() = JedisUserClient(jedisPool(), fuelYammerClient())
     @Bean open fun yammerMessageClient() = fuelYammerClient()
     @Bean open fun fuelYammerClient() = FuelYammerClient(yammerConfig())
     @Bean open fun yammerConfig() = YammerConfig(accessToken = env.getRequiredProperty("yammer.accesstoken"))
-    @Bean open fun jedis() = Jedis(JedisShardInfo(env.getRequiredProperty("redis.host"), env.getProperty("redis.port", Int::class.java, 6379))
-            .apply {password = env.getRequiredProperty("redis.password")})
+    @Bean open fun jedisPool() = JedisPool(JedisPoolConfig(), env.getRequiredProperty("redis.host"), env.getProperty("redis.port", Int::class.java, 6379), env.getProperty("redis.timeout", Int::class.java, 5000), env.getRequiredProperty("redis.password"))
 
 }
