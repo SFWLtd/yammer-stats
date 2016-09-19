@@ -8,7 +8,7 @@ open class StatsApplication {
 
     companion object {
         @JvmStatic fun main(args: Array<String>) {
-            SpringApplication.run(StatsApplication::class.java, *args);
+            SpringApplication.run(StatsApplication::class.java, *args)
         }
     }
 }

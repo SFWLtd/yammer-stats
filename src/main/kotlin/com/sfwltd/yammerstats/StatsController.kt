@@ -2,14 +2,13 @@ package com.sfwltd.yammerstats;
 
 import com.sfwltd.yammerstats.client.YammerMessageClient
 import com.sfwltd.yammerstats.client.YammerUserClient
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.lang.Math.min
 import java.util.*
 
 @RestController
-class StatsController @Autowired constructor(val yammerMessageClient: YammerMessageClient, val yammerUserClient: YammerUserClient) {
+class StatsController constructor(val yammerMessageClient: YammerMessageClient, val yammerUserClient: YammerUserClient) {
 
     data class LeaderboardEntry(val name: String, val likes: Int)
 

@@ -16,6 +16,7 @@ open class StatsConfiguration {
 
     @Autowired lateinit var env:Environment;
 
+    @Bean open fun statsController() = StatsController(yammerMessageClient(), fuelYammerClient())
     @Bean open fun yammerUserClient() = JedisUserClient(jedisPool(), fuelYammerClient())
     @Bean open fun yammerMessageClient() = fuelYammerClient()
     @Bean open fun fuelYammerClient() = FuelYammerClient(yammerConfig())
