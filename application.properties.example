@@ -1,5 +1,5 @@
-yammer.accesstoken=#{yammer_accesstoken}#
+yammer.accesstoken=__yammer.accesstoken__
 
-redis.host=#{redis_host}#
-redis.port=#{redis_port}#
-redis.password=#{redis_password}#
+redis.host=__redis.host__
+redis.port=__redis.port__
+redis.password=__redis.password__
