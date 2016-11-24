@@ -20,7 +20,7 @@ class FuelYammerClient @Autowired constructor(val yammerConfig: StatsConfigurati
     }
 
     override fun getMessages(olderThan: Int): List<YammerMessageClient.YammerMessage> {
-        val (request, response, result) = "/api/v1/messages.json".httpGet(listOf("older_than" to olderThan)).run {
+        val (_, response, result) = "/api/v1/messages.json".httpGet(listOf("older_than" to olderThan)).run {
             httpHeaders.put("Authorization", "Bearer ${yammerConfig.accessToken}")
             response()
         }
@@ -36,7 +36,7 @@ class FuelYammerClient @Autowired constructor(val yammerConfig: StatsConfigurati
     }
 
     override fun getUserFullName(id: Int): String? {
-        val (request, response, result) = "/api/v1/users/$id.json".httpGet().run {
+        val (_, response, result) = "/api/v1/users/$id.json".httpGet().run {
             httpHeaders.put("Authorization", "Bearer ${yammerConfig.accessToken}")
             response()
         }

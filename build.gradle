@@ -4,9 +4,12 @@ version '0.1-SNAPSHOT'
 buildscript {
     repositories {
         mavenCentral()
+        maven {
+            url "http://dl.bintray.com/kotlin/kotlin-eap-1.1"
+        }
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.1-2"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1-M03"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:1.3.3.RELEASE"
     }
 }
@@ -19,13 +22,16 @@ apply plugin: 'spring-boot'
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url "http://dl.bintray.com/kotlin/kotlin-eap-1.1"
+    }
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.0.1-2'
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1-M03'
     compile("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }
