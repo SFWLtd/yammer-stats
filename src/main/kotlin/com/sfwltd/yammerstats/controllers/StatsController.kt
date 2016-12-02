@@ -1,4 +1,4 @@
-package com.sfwltd.yammerstats;
+package com.sfwltd.yammerstats.controllers;
 
 import com.sfwltd.yammerstats.client.YammerMessageClient
 import com.sfwltd.yammerstats.client.YammerUserClient
@@ -13,21 +13,21 @@ class StatsController constructor(val yammerMessageClient: YammerMessageClient, 
     data class LeaderboardEntry(val name: String, val likes: Int)
 
     @RequestMapping("/toplikes")
-    fun topLikes(): List<LeaderboardEntry> {
+    fun topLikes(): Iterable<LeaderboardEntry> {
         val likeMap = HashMap<Int, Int>()
         var olderThan = Int.MAX_VALUE
 
-        for (pages in 1..10) {
+        (1..10).forEach {
             yammerMessageClient.getMessages(olderThan)
-                .filter {it.likes > 0}
-                .forEach {
-                    likeMap[it.senderId] = likeMap.getOrDefault(it.senderId, 0) + it.likes
-                    olderThan = min(it.id, olderThan)
-                }
+                    .filter {it.likes > 0}
+                    .forEach {
+                        likeMap[it.senderId] = likeMap.getOrDefault(it.senderId, 0) + it.likes
+                        olderThan = min(it.id, olderThan)
+                    }
         }
 
         return likeMap.map { LeaderboardEntry(yammerUserClient.getUserFullName(it.key) ?: "Unknown", it.value) }
-            .fold(listOf<LeaderboardEntry>()) {list, entry -> list+entry}
+            .fold(listOf<LeaderboardEntry>()) { list, entry -> list+entry}
             .sortedByDescending { it.likes }
     }
 }

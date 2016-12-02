@@ -10,9 +10,9 @@ import com.sfwltd.yammerstats.client.YammerUserClient
 import org.springframework.beans.factory.annotation.Autowired
 import java.io.ByteArrayInputStream
 
-class FuelYammerClient @Autowired constructor(val yammerConfig: StatsConfiguration.YammerConfig): YammerMessageClient, YammerUserClient {
+class FuelYammerClient constructor(val yammerConfig: StatsConfiguration.YammerConfig): YammerMessageClient, YammerUserClient {
 
-    val parser: Parser;
+    val parser: Parser
 
     init {
         FuelManager.instance.basePath = yammerConfig.host
@@ -41,12 +41,8 @@ class FuelYammerClient @Autowired constructor(val yammerConfig: StatsConfigurati
             response()
         }
         when (result) {
-            is Result.Success -> {
-                return (parser.parse(ByteArrayInputStream(response.data)) as JsonObject).string("full_name")
-            }
-            is Result.Failure -> {
-                return null
-            }
+            is Result.Success -> return (parser.parse(ByteArrayInputStream(response.data)) as JsonObject).string("full_name")
+            is Result.Failure -> return null
         }
     }
 
