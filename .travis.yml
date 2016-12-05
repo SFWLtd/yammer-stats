@@ -1,8 +1,0 @@
-language: java
-jdk:
-  - oraclejdk8
-sudo: required
-
-deploy:  
- provider: azure_web_apps
- verbose: true
