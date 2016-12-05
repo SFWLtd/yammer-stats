@@ -1,4 +1,4 @@
-# yammer-stats [![Build Status](https://travis-ci.org/SFWLtd/yammer-stats.svg?branch=master)](https://travis-ci.org/alondero/yammer-stats)
+# yammer-stats
 Provides some stats about a Yammer organisation.
 
 ## How to build and run
