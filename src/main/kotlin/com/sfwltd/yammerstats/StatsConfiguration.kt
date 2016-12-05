@@ -14,7 +14,7 @@ import redis.clients.jedis.JedisPoolConfig
 @Configuration
 open class StatsConfiguration {
 
-    data class YammerConfig(val host:String = "https://yammer.com", val accessToken: String)
+    data class YammerConfig(val host:String = "https://yammer.com", val exportHost:String = "https://export.yammer.com", val accessToken: String)
 
     @Autowired lateinit var env:Environment
 

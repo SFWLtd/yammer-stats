@@ -1,16 +1,17 @@
 package com.sfwltd.yammerstats.controllers
 
+import com.sfwltd.yammerstats.client.YammerExportClient
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletResponse
 
 
 @RestController
-class UpdateController {
+class UpdateController(val exportClient: YammerExportClient) {
 
-    @RequestMapping(method = arrayOf(RequestMethod.POST), path = arrayOf("/update"))
-    fun update(response: HttpServletResponse) {
+    @RequestMapping("/update")
+    fun update(response: HttpServletResponse): ByteArray {
         response.status = HttpServletResponse.SC_OK
+        return exportClient.export()
     }
 }
