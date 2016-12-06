@@ -12,6 +12,7 @@ class UpdateController(val exportClient: YammerExportClient) {
     @RequestMapping("/update")
     fun update(response: HttpServletResponse): ByteArray {
         response.status = HttpServletResponse.SC_OK
+        response.contentType = "application/zip"
         return exportClient.export()
     }
 }

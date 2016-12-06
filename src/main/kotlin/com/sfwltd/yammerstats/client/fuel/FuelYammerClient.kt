@@ -10,6 +10,7 @@ import com.github.kittinunf.result.Result
 import com.sfwltd.yammerstats.StatsConfiguration
 import com.sfwltd.yammerstats.client.YammerExportClient
 import com.sfwltd.yammerstats.client.YammerMessageClient
+import com.sfwltd.yammerstats.client.YammerMessageClient.YammerMessage
 import com.sfwltd.yammerstats.client.YammerUserClient
 import org.springframework.beans.factory.annotation.Autowired
 import java.io.ByteArrayInputStream
@@ -24,20 +25,16 @@ class FuelYammerClient constructor(val yammerConfig: StatsConfiguration.YammerCo
         parser = Parser()
     }
 
-    override fun getMessages(olderThan: Int): List<YammerMessageClient.YammerMessage> =
+    override fun getMessages(olderThan: Int): List<YammerMessage> =
         "/api/v1/messages.json".httpGet(listOf("older_than" to olderThan)).callWithAuth()?.
                 array<JsonObject>("messages")?.
-                map {
-                    YammerMessageClient.YammerMessage(it.int("id")!!,
-                            (it["liked_by"] as JsonObject).int("count")!!,
-                            it.int("sender_id")!!)
-                }
+                map {YammerMessage(it.int("id")!!, (it["liked_by"] as JsonObject).int("count")!!, it.int("sender_id")!!)}
                 ?: emptyList()
 
     override fun getUserFullName(id: Int): String? = "/api/v1/users/$id.json".httpGet().callWithAuth()?.string("full_name")
 
     override fun export(from: LocalDateTime, to: LocalDateTime): ByteArray {
-        val (_, response, result) = FuelManager().request(Method.POST, "${yammerConfig.exportHost}/api/v1/export", null).run {
+        val (_, response, result) = FuelManager().request(Method.GET, "${yammerConfig.exportHost}/api/v1/export", listOf("since" to "2016-11-01T00:00:00+00:00")).run {
             httpHeaders.put("Authorization", "Bearer ${yammerConfig.accessToken}")
             httpHeaders.put("Accept", "application/zip")
             response()
